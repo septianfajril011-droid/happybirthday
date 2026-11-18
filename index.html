@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Little Universe For You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Poppins:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* ═══ ROOT & RESET ═══ */
+        :root {
+            --sr-bg: #FFF9F5;
+            --sr-pink: #F4C7D5;
+            --sr-rose: #D991AA;
+            --sr-lavender: #E9DDF5;
+            --vr-bg: #F5F0E8;
+            --vr-burgundy: #321514;
+            --vr-choco: #351A19;
+            --vr-white: #FFFDF8;
+            --vr-rose: #C9959E;
+            --text-dark: #333;
+            --text-light: #666;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--sr-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .script-font { font-family: 'Great Vibes', cursive; }
+
+        /* ═══ GLOBAL UTILS ═══ */
+        .section {
+            min-height: 100vh;
+            padding: 80px 20px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+        }
+        .section.active { display: flex; animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            border-radius: 20px;
+        }
+
+        /* ═══ NAVIGATION BUTTONS ═══ */
+        .nav-btn {
+            background: var(--sr-rose);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(217, 145, 170, 0.4);
+        }
+        .nav-btn:hover { transform: translateY(-3px); background: #c97d95; }
+        .nav-btn.top-right { position: absolute; top: 20px; right: 20px; margin-top: 0; padding: 8px 20px; font-size: 12px; }
+
+        /* ═══ MUSIC PLAYER ═══ */
+        .music-player {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 15px; padding: 10px 20px; z-index: 1000; width: 90%; max-width: 350px;
+        }
+        .music-info { flex: 1; text-align: left; }
+        .song-title { font-weight: 600; font-size: 13px; }
+        .artist { font-size: 11px; color: var(--sr-rose); }
+        .play-btn { background: var(--sr-rose); border: none; width: 36px; height: 36px; border-radius: 50%; color: white; cursor: pointer; display: grid; place-items: center; }
+        .equalizer { display: flex; gap: 3px; height: 15px; align-items: flex-end; }
+        .equalizer span { width: 3px; background: var(--sr-rose); animation: eq 1s infinite; }
+        .equalizer span:nth-child(2) { animation-delay: 0.2s; }
+        .equalizer span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes eq { 0%, 100% { height: 4px; } 50% { height: 15px; } }
+        .paused .equalizer span { animation-play-state: paused; height: 4px; }
+
+        /* ═══ SECTION 1: WELCOME ═══ */
+        #sec-welcome { background: linear-gradient(135deg, var(--sr-bg) 0%, var(--sr-lavender) 100%); }
+        #sec-welcome h1 { font-size: clamp(2.5rem, 8vw, 4rem); color: var(--sr-rose); margin-bottom: 10px; }
+        .date-badge { background: var(--sr-pink); padding: 6px 16px; border-radius: 20px; display: inline-block; margin: 20px 0; font-weight: 600; }
+
+        /* ═══ SECTION 2: COUNTDOWN ═══ */
+        .countdown-timer { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .time-box { background: var(--sr-pink); color: white; padding: 15px; border-radius: 12px; min-width: 65px; }
+        .time-box span { font-size: 1.5rem; font-weight: 700; display: block; }
+        .time-box small { font-size: 10px; text-transform: uppercase; }
+
+        /* ═══ SECTION 3: MEMORIES ═══ */
+        .scrapbook-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; width: 100%; max-width: 600px; margin-top: 30px; }
+        .polaroid { background: white; padding: 8px 8px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: rotate(-3deg); cursor: pointer; transition: 0.3s; }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid:hover { transform: scale(1.05) rotate(0); z-index: 2; }
+        .polaroid img { width: 100%; height: 140px; object-fit: cover; border-radius: 4px; }
+        .polaroid p { font-family: 'Playfair Display', serif; font-size: 12px; margin-top: 8px; color: #555; }
+
+        /* ═══ SECTION 4: LETTER ═══ */
+        .envelope-wrapper { width: 100%; max-width: 300px; height: 180px; position: relative; cursor: pointer; margin-top: 30px; }
+        .envelope { width: 100%; height: 100%; background: var(--sr-pink); border-radius: 10px; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.8s; }
+        .flap { position: absolute; top: 0; left: 0; width: 100%; height: 90px; background: var(--sr-rose); clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: top; transition: 0.8s; z-index: 2; }
+        .letter-paper { 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    right: 10px; 
+    bottom: 10px; 
+    background: white; 
+    border-radius: 8px; 
+    padding: 20px; 
+    opacity: 0; 
+    z-index: 1; 
+    transition: 0.8s; 
+    overflow-y: auto; 
+    text-align: left;
+    word-break: break-word;}
+        .envelope-wrapper.open .letter-paper { opacity: 1; z-index: 3; top: -100px; height: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .letter-paper h3 { font-family: 'Great Vibes', cursive; font-size: 24px; color: var(--sr-rose); margin-bottom: 10px; }
+        .letter-paper p { 
+    font-family: 'Poppins', sans-serif; /* Ganti font ke Poppins biar spasinya jelas */
+    font-size: 14px; 
+    line-height: 1.8; /* Kasih jarak antar baris yang lebih lega */
+    color: #333;
+    text-align: left; 
+    word-wrap: break-word; 
+    white-space: pre-wrap; /* INI KUNCINYA: Biar spasi dan enter kebaca */
+    margin-top: 10px;
+}
+
+        /* ═══ SECTION 5: 23 REASONS ═══ */
+        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 12px; width: 100%; max-width: 500px; margin-top: 20px; }
+        .flip-card { perspective: 1000px; height: 100px; cursor: pointer; }
+        .flip-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+        .flip-front, .flip-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: grid; place-items: center; border-radius: 12px; padding: 10px; text-align: center; }
+        .flip-front { background: var(--sr-lavender); font-size: 1.5rem; font-weight: bold; color: var(--sr-rose); }
+        .flip-back { background: var(--sr-rose); color: white; font-size: 11px; transform: rotateY(180deg); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VINTAGE ROMANTIC THEME (Section 6, 7, 8)
+           ═══════════════════════════════════════════════════════════════ */
+        .vintage-bg { background-color: var(--vr-bg); color: var(--vr-choco); }
+        .vintage-title { font-family: 'Great Vibes', cursive; font-size: clamp(2.5rem, 8vw, 4rem); color: var(--vr-burgundy); margin-bottom: 20px; }
+        
+        .v-card { background: var(--vr-burgundy); color: var(--vr-white); border: 2px solid var(--vr-white); border-radius: 15px; padding: 25px; text-align: left; margin-bottom: 15px; box-shadow: 5px 5px 0 rgba(50,21,20,0.3); width: 100%; max-width: 400px; }
+        .v-card h3 { font-family: 'Great Vibes', cursive; font-size: 1.8rem; color: var(--vr-rose); margin-bottom: 10px; }
+        .v-card p { font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.5; }
+
+        .v-layout { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 800px; }
+        @media(min-width: 768px) { .v-layout { flex-direction: row; align-items: center; } .v-layout > * { flex: 1; } }
+        .v-polaroid { background: var(--vr-white); padding: 10px 10px 30px; box-shadow: 3px 3px 10px rgba(0,0,0,0.2); border: 1px solid #ddd; transform: rotate(-2deg); }
+        .v-polaroid img { width: 100%; height: 200px; object-fit: cover; filter: sepia(0.3); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FLOWER ANIMATION
+           ═══════════════════════════════════════════════════════════════ */
+        .flower-container { position: relative; width: 100%; height: 300px; display: flex; justify-content: center; align-items: flex-end; }
+        .flower-svg { width: 150px; height: 300px; overflow: visible; }
+        
+        .stem {
+            fill: none; stroke: #4a5d23; stroke-width: 5; stroke-linecap: round;
+            stroke-dasharray: 300; stroke-dashoffset: 300;
+            animation: growStem 2s ease-out forwards;
+        }
+        @keyframes growStem { to { stroke-dashoffset: 0; } }
+
+        .leaf {
+            fill: #4a5d23; opacity: 0; transform-origin: bottom center;
+            animation: growLeaf 1s ease 1s forwards;
+        }
+        @keyframes growLeaf { to { opacity: 1; transform: scale(1); } }
+
+        .flower-petal {
+            fill: #ff4d6d; opacity: 0; transform-origin: 0px 0px;
+            animation: bloomPetal 0.6s ease forwards;
+        }
+        .flower-petal:nth-child(1) { animation-delay: 1.5s; }
+        .flower-petal:nth-child(2) { animation-delay: 1.7s; }
+        .flower-petal:nth-child(3) { animation-delay: 1.9s; }
+        .flower-petal:nth-child(4) { animation-delay: 2.1s; }
+        .flower-petal:nth-child(5) { animation-delay: 2.3s; }
+
+        @keyframes bloomPetal {
+            0% { opacity: 0; transform: scale(0) rotate(0deg); }
+            100% { opacity: 1; transform: scale(1) rotate(var(--rot)); }
+        }
+        
+        .flower-center { fill: #FFD700; opacity: 0; animation: popCenter 0.5s ease 2.5s forwards; }
+        @keyframes popCenter { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* ═══ MAKE A WISH ═══ */
+        .cake-container { position: relative; margin: 40px auto; width: 150px; }
+        .cake { width: 100%; height: 80px; background: #F4C7D5; border-radius: 10px 10px 0 0; position: relative; border-bottom: 10px solid #E9DDF5; }
+        .candle { width: 10px; height: 40px; background: white; position: absolute; top: -40px; left: 50%; transform: translateX(-50%); border-radius: 4px; border: 1px solid #ddd; }
+        .flame { width: 12px; height: 18px; background: #FFD700; border-radius: 50% 50% 20% 20%; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); box-shadow: 0 0 10px #FFD700; animation: flicker 0.5s infinite alternate; transition: 0.5s; }
+        @keyframes flicker { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.1); opacity: 0.8; } }
+        .flame.out { opacity: 0; transform: translateX(-50%) scale(0); box-shadow: none; }
+
+        /* ═══ FINAL SURPRISE ═══ */
+        #sec-final { background: linear-gradient(180deg, var(--sr-bg) 0%, var(--sr-pink) 100%); }
+        .final-text { font-family: 'Great Vibes', cursive; font-size: clamp(3rem, 10vw, 5rem); color: white; text-shadow: 2px 2px 10px var(--sr-rose); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Music Player -->
+    <div class="music-player glass paused" id="musicPlayer">
+        <div class="music-info">
+            <div class="song-title">Hannah Monntana</div>
+            <div class="artist">For You ♡</div>
+        </div>
+        <div class="equalizer"><span></span><span></span><span></span></div>
+        <button class="play-btn" id="playBtn">▶</button>
+        <audio id="bgMusic" loop>
+            <!-- GANTI LINK MP3 INI -->
+            <source src="https://files.catbox.moe/4su085.mp4" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- SECTION 1: WELCOME -->
+    <section id="sec-welcome" class="section active">
+        <h1>A Little Universe<br>For You</h1>
+        <p style="margin-bottom:20px; color:var(--text-light)">Today is all about someone special.</p>
+        <div class="date-badge">24 November 2026</div>
+        <br>
+        <button class="nav-btn" onclick="nextSection(2)">Open Your Surprise ♡</button>
+    </section>
+
+    <!-- SECTION 2: COUNTDOWN -->
+    <section id="sec-countdown" class="section">
+        <div class="glass" style="padding:30px; width:100%; max-width:400px;">
+            <h2>Counting Down To Your Day</h2>
+            <div class="countdown-timer">
+                <div class="time-box"><span id="days">00</span><small>Days</small></div>
+                <div class="time-box"><span id="hours">00</span><small>Hours</small></div>
+                <div class="time-box"><span id="mins">00</span><small>Mins</small></div>
+                <div class="time-box"><span id="secs">00</span><small>Secs</small></div>
+            </div>
+            <div id="bdayMsg" class="hidden" style="margin-top:20px; color:var(--sr-rose); font-weight:bold;">Happy Birthday sayangg 🎉</div>
+        </div>
+        <button class="nav-btn" onclick="nextSection(3)">Next →</button>
+    </section>
+
+    <!-- SECTION 3: OUR MEMORIES -->
+    <section id="sec-memories" class="section">
+        <h2 class="script-font" style="font-size:2.5rem; color:var(--sr-rose); margin-bottom:10px;">Our Memories</h2>
+        <div class="scrapbook-grid">
+            <div class="polaroid" onclick="alert('Fitur zoom foto bisa ditambahkan di sini')">
+                <img src="https://files.catbox.moe/7u81qx.jpg" alt="Memory">
+                <p>Our Favorite Day</p>
+            </div>
+            <div class="polaroid" onclick="alert('Fitur zoom foto bisa ditambahkan di sini')">
+                <img src="https://files.catbox.moe/8mea1t.jpg" alt="Memory">
+                <p> u smile so look beautiful</p>
+            </div>
+            <div class="polaroid" onclick="alert('Fitur zoom foto bisa ditambahkan di sini')">
+                <img src="https://files.catbox.moe/jr1sjr.jpg" alt="Memory">
+                <p>Together</p>
+            </div>
+        </div>
+        <button class="nav-btn" onclick="nextSection(4)">Next →</button>
+    </section>
+
+    <!-- SECTION 4: A LETTER FOR YOU -->
+    <section id="sec-letter" class="section">
+        <h2 class="script-font" style="font-size:2.5rem; color:var(--sr-rose);">A Little Letter</h2>
+        <div class="envelope-wrapper" onclick="openEnvelope()">
+            <div class="envelope">
+                <div class="flap"></div>
+                <div class="letter-paper">
+                    <h3>For you</h3>
+                    <p id="typedText"></p>
+                </div>
+            </div>
+        </div>
+        <button class="nav-btn" onclick="nextSection(5)">Next →</button>
+    </section>
+
+    <!-- SECTION 5: 23 LITTLE REASONS -->
+    <section id="sec-reasons" class="section">
+        <h2 class="script-font" style="font-size:2.5rem; color:var(--sr-rose);">23 Little Reasons</h2>
+        <div class="reasons-grid" id="reasonsGrid"></div>
+        <button class="nav-btn" onclick="nextSection(6)">Next →</button>
+    </section>
+
+    <!-- SECTION 6: KENAPA KAMU SPESIAL BANGET? (VINTAGE) -->
+    <section id="sec-spesial" class="section vintage-bg">
+        <button class="nav-btn top-right" onclick="nextSection(7)">Next →</button>
+        <h2 class="vintage-title">Kenapa Kamu<br>Spesial Banget?</h2>
+        
+        <div class="v-card">
+            <h3>Senyuman</h3>
+            <p>Senyum dan tawamu selalu menjadi penyemangat terbaik. Bahkan di hari yang melelahkan, senyummu punya cara sederhana untuk membuat semuanya terasa lebih baik.</p>
+        </div>
+        <div class="v-card">
+            <h3>Penyayang</h3>
+            <p>Cara kamu memberikan perhatian, kasih sayang, dan hal-hal kecil yang sederhana selalu punya arti besar. Terima kasih sudah menjadi seseorang yang begitu berarti.</p>
+        </div>
+        <div class="v-card">
+            <h3>Dukungan</h3>
+            <p>Kamu selalu punya cara untuk memberikan semangat dan dukungan. Kehadiranmu membuat banyak hal terasa lebih ringan dan bermakna.</p>
+        </div>
+    </section>
+
+    <!-- SECTION 7: I LOVE YOU (VINTAGE) -->
+    <section id="sec-vintage-love" class="section vintage-bg">
+        <button class="nav-btn top-right" onclick="nextSection(8)">Next →</button>
+        <h2 class="vintage-title">I Love You</h2>
+        
+        <div class="v-layout">
+            <div class="v-polaroid">
+                <img src="https://files.catbox.moe/kvp97z.jpg" alt="Polaroid">
+            </div>
+            <div class="v-card" style="max-width: 100%;">
+                <p>hari ini bukan cuma tentang bertambahnya usiamu, tapi juga tentang merayakan hadirnya kamu di dunia ini. Aku berharap hari-harimu selalu dipenuhi kebahagiaan, hal-hal baik, dan banyak alasan untuk tersenyum.<br><br>
+                di usiamu yang baru ini, aku berdoa semoga kamu selalu dilimpahi kebahagiaan yang tak terbatas, kesehatan yang prima, dan kemudahan dalam meraih semua mimpi-mimpimu. Semoga kamu selalu dikelilingi hal-hal baik dan orang-orang yang mencintaimu. Tetaplah jadi diri sendiri yang hangat dan mengagumkan seperti yang aku kenal.<br><br>
+                terima kasih sudah menjadi seseorang yang begitu spesial. Aku harap kamu selalu ingat bahwa kamu berharga, kamu pantas mendapatkan hal-hal baik, dan kamu layak untuk bahagia. selamat ulang tahun sayangg, im so lucky have to you sayangg. ♡</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 8: BEAUTIFUL FLOWERS -->
+    <section id="sec-flowers" class="section vintage-bg">
+        <button class="nav-btn top-right" onclick="nextSection(9)">Next →</button>
+        <h2 class="vintage-title">Beautiful Flowers</h2>
+        
+        <div class="v-layout">
+            <!-- SVG Animation Bunga -->
+            <div class="flower-container">
+                <svg class="flower-svg" viewBox="0 0 150 300">
+                    <path class="stem" d="M75,300 Q60,200 75,120" />
+                    <path class="leaf" d="M68,220 Q30,200 55,170 Q85,200 68,220" />
+                    <path class="leaf" d="M82,170 Q120,150 95,120 Q65,150 82,170" />
+                    
+                    <g transform="translate(75, 120)">
+                        <ellipse class="flower-petal" cx="0" cy="-25" rx="12" ry="30" style="--rot: 0deg;" />
+                        <ellipse class="flower-petal" cx="0" cy="-25" rx="12" ry="30" style="--rot: 72deg;" transform="rotate(72)" />
+                        <ellipse class="flower-petal" cx="0" cy="-25" rx="12" ry="30" style="--rot: 144deg;" transform="rotate(144)" />
+                        <ellipse class="flower-petal" cx="0" cy="-25" rx="12" ry="30" style="--rot: 216deg;" transform="rotate(216)" />
+                        <ellipse class="flower-petal" cx="0" cy="-25" rx="12" ry="30" style="--rot: 288deg;" transform="rotate(288)" />
+                        <circle class="flower-center" cx="0" cy="0" r="10" />
+                    </g>
+                </svg>
+            </div>
+            
+            <div class="v-card" style="max-width: 100%;">
+                <p>"Katanya bunga itu simbol ketulusan dan keindahan. Setiap helai kelopak dan warnanya membawa doa serta harapan baik.<br><br>
+                Semoga keindahan bunga ini bisa sedikit mewarnai harimu dan menghadirkan senyum bahagia di wajahmu.terima kasih sudsh selalu menjadi sosok yang luar biasa dsn terus memancarkan energi positif untuk orang orang di sekitarmu,semoga hari hsri mu kedepan selalu mekar indah dan dipenuhi dengan hal hal manis.<br><br>
+                Keep blooming, my beautiful flower. ♡"</p>
+                <button class="nav-btn" style="margin-top:15px; width:100%;" onclick="replayFlower()">Bloom For You ♡</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 9: YOU DESERVE ALL THE HAPPINESS -->
+    <section id="sec-happiness" class="section" style="background: linear-gradient(180deg, var(--sr-bg), var(--sr-lavender));">
+        <h2 class="script-font" style="font-size:2.5rem; color:var(--sr-rose);">You Deserve Every Little Happiness</h2>
+        <p style="margin: 20px auto; max-width: 400px;">Semoga kamu selalu dikelilingi oleh orang-orang baik, diberikan kesehatan, dan selalu menemukan alasan untuk tersenyum setiap hari. Kamu pantas mendapatkan semua hal baik di dunia ini.</p>
+        <button class="nav-btn" onclick="nextSection(10)">Next →</button>
+    </section>
+
+    <!-- SECTION 10: I LOVE YOU (INTERACTIVE) -->
+    <section id="sec-interactive-love" class="section">
+        <h2 class="script-font" style="font-size:2.5rem; color:var(--sr-rose);">I Love You, More Than Words Can Say.</h2>
+        <button class="nav-btn" onclick="showLoveHearts()" style="margin-top:40px;">Tap To See How Much ♡</button>
+        <div id="loveMessage" class="hidden" style="margin-top:20px; max-width:400px;">
+            <p>Thank you for being part of my world. I hope you always find reasons to smile, today and every day.</p>
+            <button class="nav-btn" onclick="nextSection(11)">Next →</button>
+        </div>
+    </section>
+
+    <!-- SECTION 11: MAKE A WISH -->
+    <section id="sec-wish" class="section">
+        <h2 class="script-font" style="font-size:2.5rem; color:var(--sr-rose);">Close Your Eyes And Make A Wish.</h2>
+        
+        <div class="cake-container">
+            <div class="cake">
+                <div class="candle">
+                    <div class="flame" id="flame"></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="nav-btn" id="wishBtn" onclick="blowCandle()">Make A Wish ♡</button>
+        <div id="wishMessage" class="hidden" style="margin-top:20px;">
+            <h3 style="color:var(--sr-rose); margin-bottom:15px;">May All Your Beautiful Wishes Come True.</h3>
+            <button class="nav-btn" onclick="nextSection(12)">One Last Surprise</button>
+        </div>
+    </section>
+
+    <!-- SECTION 12: FINAL SURPRISE -->
+    <section id="sec-final" class="section">
+        <h1 class="final-text">Happy Birthday,<br>Beautiful ♡</h1>
+        <p style="margin-top:20px; max-width:400px;">Semoga kamu selalu menemukan alasan untuk bahagia, terus tumbuh menjadi versi terbaik dirimu, dan mendapatkan semua hal indah yang kamu impikan.<br><br>Thank you for being you. Made with love, just for you. ♡</p>
+        <button class="nav-btn" onclick="startConfetti()">Celebrate! 🎉</button>
+        <button class="nav-btn" onclick="nextSection(1)" style="background:transparent; color:var(--sr-rose); border:2px solid var(--sr-rose); margin-top:10px;">Back to Start</button>
+    </section>
+
+    <script>
+        // ═══ NAVIGATION ═══
+        function nextSection(num) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const targetId = getSectionId(num);
+            const targetEl = document.getElementById(`sec-${targetId}`);
+            if(targetEl) {
+                targetEl.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function getSectionId(num) {
+            // Section 'why' udah dihapus, jadi urutannya menyesuaikan
+            const ids = ['welcome', 'countdown', 'memories', 'letter', 'reasons', 'spesial', 'vintage-love', 'flowers', 'happiness', 'interactive-love', 'wish', 'final'];
+            return ids[num - 1];
+        }
+
+        // ═══ MUSIC PLAYER ═══
+        const music = document.getElementById('bgMusic');
+        const playBtn = document.getElementById('playBtn');
+        const musicPlayer = document.getElementById('musicPlayer');
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                music.pause(); playBtn.innerText = '▶'; musicPlayer.classList.add('paused');
+            } else {
+                music.play(); playBtn.innerText = '⏸'; musicPlayer.classList.remove('paused');
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // ═══ COUNTDOWN ═══
+        const targetDate = new Date('November 23, 2026 00:00:00').getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const dist = targetDate - now;
+            if (dist < 0) {
+                document.getElementById('bdayMsg').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('days').innerText = Math.floor(dist / (1000 * 60 * 60 * 24));
+            document.getElementById('hours').innerText = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById('mins').innerText = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('secs').innerText = Math.floor((dist % (1000 * 60)) / 1000);
+        }, 1000);
+
+        // ═══ LOVE LETTER TYPEWRITER ═══
+        const letterText = "Happy Birthday! I just want you to know how special you are to me. Thank you for being my safe place, my biggest supporter, and my favorite person. I hope this year brings you as much joy as you bring to everyone around you. Keep shining, beautiful. ♡";
+        let letterOpened = false;
+
+        function openEnvelope() {
+            document.querySelector('.envelope-wrapper').classList.add('open');
+            if (!letterOpened) {
+                letterOpened = true;
+                let i = 0;
+                const p = document.getElementById('typedText');
+                p.innerText = '';
+                setTimeout(() => {
+                    const interval = setInterval(() => {
+                        if (i < letterText.length) { p.innerText += letterText.charAt(i); i++; }
+                        else clearInterval(interval);
+                    }, 40);
+                }, 800);
+            }
+        }
+
+        // ═══ 23 REASONS ═══
+        const reasons = ["Your smile", "Your laugh", "Your kindness", "Your eyes", "Your heart", "Your voice", "Your hugs", "Your mind", "Your patience", "Your passion", "Your humor", "Your soul", "Your strength", "Your honesty", "Your warmth", "Your vibe", "Your support", "Your face", "Your presence", "Your love", "Your flaws", "Your dreams", "Just being you"];
+        const grid = document.getElementById('reasonsGrid');
+        grid.innerHTML = '';
+        reasons.forEach((r, i) => {
+            grid.innerHTML += `
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-inner">
+                        <div class="flip-front glass">${i + 1}</div>
+                        <div class="flip-back glass">${r}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // ═══ INTERACTIVE LOVE ═══
+        function showLoveHearts() {
+            document.getElementById('loveMessage').classList.remove('hidden');
+            for(let i=0; i<20; i++) {
+                let h = document.createElement('div');
+                h.innerText = '❤️';
+                h.style.position = 'fixed';
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.top = '100vh';
+                h.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                h.style.transition = 'transform 3s linear, opacity 3s';
+                h.style.zIndex = '9999';
+                document.body.appendChild(h);
+                
+                setTimeout(() => {
+                    h.style.transform = `translateY(-${Math.random() * 100 + 50}vh) rotate(${Math.random() * 360}deg)`;
+                    h.style.opacity = '0';
+                }, 10);
+                setTimeout(() => h.remove(), 3100);
+            }
+        }
+
+        // ═══ MAKE A WISH ═══
+        function blowCandle() {
+            document.getElementById('flame').classList.add('out');
+            document.getElementById('wishBtn').style.display = 'none';
+            document.getElementById('wishMessage').classList.remove('hidden');
+            startConfetti();
+        }
+
+        // ═══ FLOWER REPLAY ═══
+        function replayFlower() {
+            const svg = document.querySelector('.flower-svg');
+            const clone = svg.cloneNode(true);
+            svg.parentNode.replaceChild(clone, svg);
+        }
+
+        // ═══ CONFETTI ═══
+        function startConfetti() {
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed'; canvas.style.inset = '0'; canvas.style.pointerEvents = 'none'; canvas.style.zIndex = '9999';
+            document.body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const p = [];
+            const colors = ['#F4C7D5', '#D991AA', '#E9DDF5', '#FFF'];
+            for(let i=0; i<80; i++) {
+                p.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height, w: Math.random()*10+5, h: Math.random()*10+5, c: colors[Math.floor(Math.random()*colors.length)], vy: Math.random()*3+2, vx: Math.random()*2-1, r: Math.random()*360 });
+            }
+            function anim() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                p.forEach(i => {
+                    i.y += i.vy; i.x += i.vx; i.r += 2;
+                    if(i.y > canvas.height) i.y = -20;
+                    ctx.save(); ctx.translate(i.x, i.y); ctx.rotate(i.r*Math.PI/180);
+                    ctx.fillStyle = i.c; ctx.fillRect(-i.w/2, -i.h/2, i.w, i.h); ctx.restore();
+                });
+                requestAnimationFrame(anim);
+            }
+            anim();
+            setTimeout(() => canvas.remove(), 5000);
+        }
+    </script>
+</body>
+</html>
+```
